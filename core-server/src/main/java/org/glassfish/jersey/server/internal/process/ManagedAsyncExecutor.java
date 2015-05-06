@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,41 +37,37 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package org.glassfish.jersey.server.internal.process;
 
-package org.glassfish.jersey.internal.inject;
-
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
 
 /**
- * {@link Qualifier Qualifier annotation} used to annotate HK2 injections and
- * bindings for user custom providers. Providers are classes which implement one
- * of the provider interfaces (for example {@link javax.ws.rs.ext.MessageBodyReader
- * Message body reader interface}).
+ * Injection qualifier that can be used to inject an {@link java.util.concurrent.ExecutorService}
+ * instance used by Jersey to execute {@link org.glassfish.jersey.server.ManagedAsync managed asynchronous requests}.
  * <p>
- * Custom providers are bound in the HK2 injection manager using {@code &#64;Custom}
- * annotation. Once bound, the custom providers can be injected using {@code &#64;Custom}
- * qualifier annotation again.
- * </p>
- * <p>
- * For example:
- * <pre>
- *  &#064;Inject
- *  &#064;Custom
- *  MessageBodyReader messageBodyReader;
- * </pre>
+ * The managed asynchronous request executor service instance injected using this injection qualifier can be customized
+ * by registering a custom {@link org.glassfish.jersey.spi.ExecutorServiceProvider} implementation that is itself annotated
+ * with the {@code &#64;ManagedAsyncExecutor} annotation.
  * </p>
  *
- * @author Miroslav Fuksa
+ * @author Marek Potociar (marek.potociar at oracle.com)
  */
-@Qualifier
+@Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Custom {
+@Documented
+@Inherited
+@Qualifier
+public @interface ManagedAsyncExecutor {
 
     /**
-     * {@code Custom} annotation instance to use for injection bindings and related queries.
+     * {@code ManagedAsyncExecutor} annotation instance to use for injection bindings and related queries.
      */
-    public static final Custom INSTANCE = new CustomAnnotationLiteral();
+    public static final ManagedAsyncExecutor INSTANCE = new ManagedAsyncExecutorLiteral();
 }

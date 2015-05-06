@@ -81,5 +81,6 @@ public final class ModelHelper {
      * Prevent instantiation.
      */
     private ModelHelper() {
+        throw new AssertionError("Instantiation not allowed.");
     }
 }

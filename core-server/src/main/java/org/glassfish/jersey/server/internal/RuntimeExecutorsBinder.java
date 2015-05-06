@@ -39,108 +39,41 @@
  */
 package org.glassfish.jersey.server.internal;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
-import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.glassfish.jersey.process.JerseyProcessingUncaughtExceptionHandler;
-import org.glassfish.jersey.spi.RuntimeThreadProvider;
+import org.glassfish.jersey.spi.ScheduledExecutorServiceProvider;
+import org.glassfish.jersey.spi.ScheduledThreadPoolExecutorProvider;
 
-import org.glassfish.hk2.api.AnnotationLiteral;
-import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-
-import org.jvnet.hk2.annotations.Optional;
-
-import jersey.repackaged.com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * Binder for injectable Jersey runtime executor services.
- *
- * Presently it implements a binding  for a {@link BackgroundScheduler background scheduler} singleton
+ * <p/>
+ * Presently it implements a default binding for a {@link BackgroundScheduler background scheduler} singleton
  * executor service.
  *
  * @author Marek Potociar (marek.potociar at oracle.com)
  */
 public class RuntimeExecutorsBinder extends AbstractBinder {
-    private static class BackgroundSchedulerFactory implements Factory<ScheduledExecutorService> {
-        private final RuntimeThreadProvider runtimeThreadProvider;
 
-        @Inject
-        public BackgroundSchedulerFactory(@Optional RuntimeThreadProvider rtp) {
-            if (rtp == null) {
-                rtp = new RuntimeThreadProvider() {
-                    @Override
-                    public ThreadFactory getRequestThreadFactory() {
-                        return new ThreadFactoryBuilder()
-                                .setNameFormat("jersey-request-specific-task-thread-%d")
-                                .setUncaughtExceptionHandler(new JerseyProcessingUncaughtExceptionHandler())
-                                .build();
-                    }
+    @BackgroundScheduler
+    private static class DefaultBackgroundSchedulerProvider extends ScheduledThreadPoolExecutorProvider {
 
-                    @Override
-                    public ThreadFactory getBackgroundThreadFactory() {
-                        return new ThreadFactoryBuilder()
-                                .setNameFormat("jersey-background-task-thread-%d")
-                                .setUncaughtExceptionHandler(new JerseyProcessingUncaughtExceptionHandler())
-                                .build();
-                    }
-                };
-            }
-
-            this.runtimeThreadProvider = rtp;
+        public DefaultBackgroundSchedulerProvider() {
+            super("jersey-background-task-scheduler");
         }
 
         @Override
-        public ScheduledExecutorService provide() {
-            final ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                    .setNameFormat("jersey-background-task-scheduler-%d")
-                    .setThreadFactory(runtimeThreadProvider.getBackgroundThreadFactory())
-                    .build();
-
-            return new ScheduledThreadPoolExecutor(1, threadFactory, new RejectedExecutionHandler() {
-                @Override
-                public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-                    // TODO: implement method.
-                }
-            });
+        protected int getCorePoolSize() {
+            return 1;
         }
-
-        @Override
-        public void dispose(final ScheduledExecutorService instance) {
-            AccessController.doPrivileged(new PrivilegedAction(){
-
-                @Override
-                public Object run() {
-                    instance.shutdown();
-                    return null;
-                }
-            });
-        }
-    }
-
-    /**
-     * {@link AnnotationLiteral Annotation literal} helper class for the
-     * {@link BackgroundScheduler &#64;BackgroundScheduler} qualifier annotation.
-     */
-    @SuppressWarnings("ClassExplicitlyAnnotation")
-    public static class BackgroundSchedulerLiteral
-            extends AnnotationLiteral<BackgroundScheduler> implements BackgroundScheduler {
     }
 
     @Override
     protected void configure() {
-        bindFactory(BackgroundSchedulerFactory.class)
-                .to(ScheduledExecutorService.class)
-                .qualifiedBy(new BackgroundSchedulerLiteral())
+        bind(DefaultBackgroundSchedulerProvider.class)
+                .to(ScheduledExecutorServiceProvider.class)
+                .qualifiedBy(BackgroundScheduler.INSTANCE)
                 .in(Singleton.class);
     }
 }

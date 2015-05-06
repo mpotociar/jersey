@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,41 +37,15 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package org.glassfish.jersey.internal.inject;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-import javax.inject.Qualifier;
+import org.glassfish.hk2.api.AnnotationLiteral;
 
 /**
- * {@link Qualifier Qualifier annotation} used to annotate HK2 injections and
- * bindings for user custom providers. Providers are classes which implement one
- * of the provider interfaces (for example {@link javax.ws.rs.ext.MessageBodyReader
- * Message body reader interface}).
- * <p>
- * Custom providers are bound in the HK2 injection manager using {@code &#64;Custom}
- * annotation. Once bound, the custom providers can be injected using {@code &#64;Custom}
- * qualifier annotation again.
- * </p>
- * <p>
- * For example:
- * <pre>
- *  &#064;Inject
- *  &#064;Custom
- *  MessageBodyReader messageBodyReader;
- * </pre>
- * </p>
+ * {@link Custom} annotation literal implementation.
  *
- * @author Miroslav Fuksa
+ * @author Marek Potociar (marek.potociar at oracle.com)
  */
-@Qualifier
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Custom {
-
-    /**
-     * {@code Custom} annotation instance to use for injection bindings and related queries.
-     */
-    public static final Custom INSTANCE = new CustomAnnotationLiteral();
+@SuppressWarnings("ClassExplicitlyAnnotation")
+class CustomAnnotationLiteral extends AnnotationLiteral<Custom> implements Custom {
 }

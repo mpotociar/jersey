@@ -54,7 +54,7 @@ import javax.inject.Singleton;
 import org.glassfish.jersey.internal.inject.ReferenceTransformingFactory;
 import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
-import org.glassfish.jersey.process.internal.RequestExecutorFactory;
+import org.glassfish.jersey.process.internal.ExecutorProviders;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.CloseableService;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -125,8 +125,8 @@ public class ServerProcessingBinder extends AbstractBinder {
                 .to(AsyncResponse.class)
                 .in(RequestScoped.class);
 
-        bind(ServerManagedAsyncExecutorFactory.class)
-                .to(RequestExecutorFactory.class)
+        bind(DefaultManagedAsyncExecutorProvider.class)
+                .to(ExecutorProviders.class)
                 .to(ContainerLifecycleListener.class)
                 .in(Singleton.class);
 

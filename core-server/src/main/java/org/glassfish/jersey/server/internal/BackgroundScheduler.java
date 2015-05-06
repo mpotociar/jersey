@@ -51,9 +51,9 @@ import javax.inject.Qualifier;
  * Injection qualifier that can be used to inject a {@link java.util.concurrent.ScheduledExecutorService}
  * instance used by Jersey to execute background timed/scheduled tasks.
  *
- * A scheduled executor service instance injected using this injection qualifier is using the threads
- * created by a pluggable {@link org.glassfish.jersey.spi.RuntimeThreadProvider#getBackgroundThreadFactory()
- * background thread factory}.
+ * A scheduled executor service instance injected using this injection qualifier can be customized by registering
+ * a custom {@link org.glassfish.jersey.spi.ScheduledExecutorServiceProvider} implementation that is itself annotated
+ * with the {@code &#64;BackgroundScheduler} annotation.
  * <p>
  * Typically, when facing a need to execute a scheduled background task, you would be creating a new
  * standalone executor service that would be using a new standalone thread pool. This would however break
@@ -65,9 +65,15 @@ import javax.inject.Qualifier;
  *
  * @author Marek Potociar (marek.potociar at oracle.com)
  */
-@Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
+@Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Qualifier
 public @interface BackgroundScheduler {
+
+    /**
+     * {@code BackgroundScheduler} annotation instance to use for injection bindings and related queries.
+     */
+    public static final BackgroundScheduler INSTANCE = new BackgroundSchedulerLiteral();
+
 }

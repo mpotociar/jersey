@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,15 +37,37 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package org.glassfish.jersey.internal.inject;
 
-import org.glassfish.hk2.api.AnnotationLiteral;
+package org.glassfish.jersey.server.gae;
+
+import java.util.concurrent.ThreadFactory;
+
+import org.glassfish.jersey.spi.ScheduledThreadPoolExecutorProvider;
 
 /**
- * Custom annotation implementation.
+ * This class implements Jersey's SPI {@link org.glassfish.jersey.spi.ScheduledExecutorServiceProvider} to provide a
+ * {@link java.util.concurrent.ScheduledExecutorService} instances with a GAE specific {@link ThreadFactory} provider
+ * - {@link com.google.appengine.api.ThreadManager}.
  *
+ * @author Libor Kramolis (libor.kramolis at oracle.com)
  * @author Marek Potociar (marek.potociar at oracle.com)
  */
-public class CustomAnnotationImpl extends AnnotationLiteral<Custom> implements Custom {
-    private static final long serialVersionUID = -892565346695359346L;
+class GaeBackgroundExecutorProvider extends ScheduledThreadPoolExecutorProvider {
+
+    /**
+     * Create new instance of GAE-specific background scheduled executor service provider.
+     */
+    public GaeBackgroundExecutorProvider() {
+        super("gae-jersey-background-task-scheduler");
+    }
+
+    @Override
+    public ThreadFactory getBackingThreadFactory() {
+        return com.google.appengine.api.ThreadManager.backgroundThreadFactory();
+    }
+
+    @Override
+    protected int getCorePoolSize() {
+        return 1;
+    }
 }

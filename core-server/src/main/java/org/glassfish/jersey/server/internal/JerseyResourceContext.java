@@ -52,7 +52,7 @@ import javax.inject.Inject;
 import javax.inject.Scope;
 import javax.inject.Singleton;
 
-import org.glassfish.jersey.internal.inject.CustomAnnotationImpl;
+import org.glassfish.jersey.internal.inject.Custom;
 import org.glassfish.jersey.internal.inject.Injections;
 import org.glassfish.jersey.internal.inject.Providers;
 import org.glassfish.jersey.internal.util.ReflectionHelper;
@@ -200,7 +200,7 @@ public class JerseyResourceContext implements ExtendedResourceContext {
                 @SuppressWarnings("unchecked")
                 AliasDescriptor aliasDescriptor = new AliasDescriptor(locator, descriptor, contract.getName(), null);
                 aliasDescriptor.setScope(scope.getName());
-                aliasDescriptor.addQualifierAnnotation(new CustomAnnotationImpl());
+                aliasDescriptor.addQualifierAnnotation(Custom.INSTANCE);
 
                 dc.bind(aliasDescriptor);
             }
@@ -249,7 +249,7 @@ public class JerseyResourceContext implements ExtendedResourceContext {
                 AliasDescriptor aliasDescriptor = new AliasDescriptor(locator, descriptor, contract.getName(), null);
                 aliasDescriptor.setScope(scope.getName());
                 aliasDescriptor.setRanking(providerModel.getPriority(contract));
-                aliasDescriptor.addQualifierAnnotation(new CustomAnnotationImpl());
+                aliasDescriptor.addQualifierAnnotation(Custom.INSTANCE);
 
                 dc.bind(aliasDescriptor);
             }

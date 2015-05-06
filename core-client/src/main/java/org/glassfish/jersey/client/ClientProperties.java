@@ -123,9 +123,10 @@ public final class ClientProperties {
      * number of threads will be utilized. Zero or negative values will be ignored.
      * </p>
      * <p>
-     * Note that the property is ignored if a custom {@link org.glassfish.jersey.spi.RequestExecutorProvider}
-     * is configured in the client runtime.
+     * Note that the property may be ignored if a custom {@link org.glassfish.jersey.spi.ExecutorServiceProvider}
+     * is configured to execute asynchronous requests in the client runtime.
      * </p>
+     * TODO add pointer to the relevant qualifier annotation
      * <p>
      * A default value is not set.
      * </p>

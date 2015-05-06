@@ -40,18 +40,16 @@
 
 package org.glassfish.jersey.server.gae;
 
-import org.glassfish.jersey.server.gae.internal.GaeBinder;
-
 import javax.ws.rs.ConstrainedTo;
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
 /**
- * Google App Engine JAX-RS Feature implementation.
- * It helps to setup JAX-RS runtime to support GAE environment.
+ * Google App Engine integration for Jersey server runtime.
  * <p>
- * Register this class in your {@link org.glassfish.jersey.server.ResourceConfig} subclass.
+ * Register this feature in your {@link org.glassfish.jersey.server.ResourceConfig} subclass in order to be able to run
+ * your Jersey application on Google App Engine.
  * </p>
  *
  * @author Libor Kramolis (libor.kramolis at oracle.com)
@@ -61,7 +59,7 @@ public final class GaeFeature implements Feature {
 
     @Override
     public boolean configure(final FeatureContext context) {
-        if (context.getConfiguration().isRegistered(GaeBinder.class) == false) {
+        if (!context.getConfiguration().isRegistered(GaeBinder.class)) {
             context.register(new GaeBinder());
         }
         return true;

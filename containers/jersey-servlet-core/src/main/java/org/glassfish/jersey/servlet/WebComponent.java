@@ -89,8 +89,8 @@ import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
+import org.glassfish.jersey.server.internal.BackgroundScheduler;
 import org.glassfish.jersey.server.internal.InternalServerProperties;
-import org.glassfish.jersey.server.internal.RuntimeExecutorsBinder;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
 import org.glassfish.jersey.servlet.internal.LocalizationMessages;
 import org.glassfish.jersey.servlet.internal.PersistenceUnitBinder;
@@ -338,13 +338,13 @@ public class WebComponent {
         this.appHandler = new ApplicationHandler(resourceConfig, webComponentBinder, locator);
 
         this.asyncExtensionDelegate = getAsyncExtensionDelegate();
-        this.forwardOn404 = webConfig.getConfigType().equals(WebConfig.ConfigType.FilterConfig)
+        this.forwardOn404 = webConfig.getConfigType() == WebConfig.ConfigType.FilterConfig
                 && resourceConfig.isProperty(ServletProperties.FILTER_FORWARD_ON_404);
         this.queryParamsAsFormParams = !resourceConfig.isProperty(ServletProperties.QUERY_PARAMS_AS_FORM_PARAMS_DISABLED);
         this.configSetStatusOverSendError = ServerProperties.getValue(resourceConfig.getProperties(),
                 ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, false, Boolean.class);
         this.backgroundTaskScheduler = appHandler.getServiceLocator()
-                .getService(ScheduledExecutorService.class, new RuntimeExecutorsBinder.BackgroundSchedulerLiteral());
+                .getService(ScheduledExecutorService.class, BackgroundScheduler.INSTANCE);
     }
 
     /**

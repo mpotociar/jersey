@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,25 +37,16 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package org.glassfish.jersey.server.internal.process;
 
-package org.glassfish.jersey.server.gae.internal;
-
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.spi.RuntimeThreadProvider;
-
-import javax.inject.Singleton;
+import org.glassfish.hk2.api.AnnotationLiteral;
 
 /**
- * GAE specific HK2 {@code AbstractBinder} to bind {@link GaeRuntimeThreadProvider}
- * to injection engine as {@link RuntimeThreadProvider} implementation.
+ * {@link ManagedAsyncExecutor} annotation literal implementation.
  *
- * @author Libor Kramolis (libor.kramolis at oracle.com)
+ * @author Marek Potociar (marek.potociar at oracle.com)
  */
-public class GaeBinder extends AbstractBinder {
-
-    @Override
-    protected void configure() {
-        bind(GaeRuntimeThreadProvider.class).to(RuntimeThreadProvider.class).in(Singleton.class);
-    }
+@SuppressWarnings("ClassExplicitlyAnnotation")
+final class ManagedAsyncExecutorLiteral extends AnnotationLiteral<ManagedAsyncExecutor> implements ManagedAsyncExecutor {
 
 }

@@ -38,33 +38,30 @@
  * holder.
  */
 
-package org.glassfish.jersey.server.gae.internal;
+package org.glassfish.jersey.server.gae;
 
-import org.glassfish.jersey.spi.RuntimeThreadProvider;
+import javax.inject.Singleton;
 
-import java.util.concurrent.ThreadFactory;
-import java.util.logging.Logger;
+import org.glassfish.jersey.server.internal.BackgroundScheduler;
+import org.glassfish.jersey.spi.ScheduledExecutorServiceProvider;
+
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
 /**
- * This class implements Jersey's SPI {@link RuntimeThreadProvider} to get {@link ThreadFactory} instance by
- * GAE specific {@code ThreadFactory} provider - {@link com.google.appengine.api.ThreadManager}.
+ * GAE specific HK2 {@code AbstractBinder} to bind {@link GaeBackgroundExecutorProvider}
+ * to injection engine as {@link org.glassfish.jersey.spi.ScheduledExecutorServiceProvider} implementation
+ * providing the {@link org.glassfish.jersey.server.internal.BackgroundScheduler background} task scheduler.
  *
  * @author Libor Kramolis (libor.kramolis at oracle.com)
  */
-public class GaeRuntimeThreadProvider implements RuntimeThreadProvider {
-
-    private static final Logger LOGGER = Logger.getLogger(GaeRuntimeThreadProvider.class.getName());
+class GaeBinder extends AbstractBinder {
 
     @Override
-    public ThreadFactory getRequestThreadFactory() {
-        LOGGER.entering(this.getClass().getName(), "getRequestThreadFactory");
-        return com.google.appengine.api.ThreadManager.currentRequestThreadFactory();
-    }
-
-    @Override
-    public ThreadFactory getBackgroundThreadFactory() {
-        LOGGER.entering(this.getClass().getName(), "getBackgroundThreadFactory");
-        return com.google.appengine.api.ThreadManager.backgroundThreadFactory();
+    protected void configure() {
+        bind(GaeBackgroundExecutorProvider.class)
+                .to(ScheduledExecutorServiceProvider.class)
+                .qualifiedBy(BackgroundScheduler.INSTANCE)
+                .in(Singleton.class);
     }
 
 }

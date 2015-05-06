@@ -63,7 +63,7 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import javax.inject.Singleton;
 
 import org.glassfish.jersey.internal.inject.ContextInjectionResolver;
-import org.glassfish.jersey.internal.inject.CustomAnnotationImpl;
+import org.glassfish.jersey.internal.inject.Custom;
 import org.glassfish.jersey.internal.inject.Injections;
 import org.glassfish.jersey.internal.inject.ProviderBinder;
 import org.glassfish.jersey.internal.inject.Providers;
@@ -247,13 +247,13 @@ public class ProviderBinderTest {
     }
 
     private ContainerResponseFilter getResponseFilter(ServiceLocator locator) {
-        ContainerResponseFilter responseFilter = locator.getService(ContainerResponseFilter.class, new CustomAnnotationImpl());
+        ContainerResponseFilter responseFilter = locator.getService(ContainerResponseFilter.class, Custom.INSTANCE);
         assertEquals(Child.class, responseFilter.getClass());
         return responseFilter;
     }
 
     private ContainerRequestFilter getRequestFilter(ServiceLocator locator) {
-        ContainerRequestFilter requestFilter = locator.getService(ContainerRequestFilter.class, new CustomAnnotationImpl());
+        ContainerRequestFilter requestFilter = locator.getService(ContainerRequestFilter.class, Custom.INSTANCE);
         assertEquals(Child.class, requestFilter.getClass());
         return requestFilter;
     }

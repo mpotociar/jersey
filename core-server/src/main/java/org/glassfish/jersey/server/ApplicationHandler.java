@@ -97,6 +97,7 @@ import org.glassfish.jersey.model.internal.RankedComparator;
 import org.glassfish.jersey.model.internal.RankedComparator.Order;
 import org.glassfish.jersey.model.internal.RankedProvider;
 import org.glassfish.jersey.process.internal.ChainableStage;
+import org.glassfish.jersey.process.internal.ExecutorProviders;
 import org.glassfish.jersey.process.internal.Stage;
 import org.glassfish.jersey.process.internal.Stages;
 import org.glassfish.jersey.server.internal.ConfigHelper;
@@ -537,6 +538,8 @@ public final class ApplicationHandler {
         }
 
         bindEnhancingResourceClasses(resourceModel, resourceBag, componentProviders);
+
+        ExecutorProviders.createInjectionBindings(locator);
 
         // initiate resource model into JerseyResourceContext
         final JerseyResourceContext jerseyResourceContext = locator.getService(JerseyResourceContext.class);

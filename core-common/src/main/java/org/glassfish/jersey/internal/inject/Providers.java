@@ -198,7 +198,7 @@ public final class Providers {
      * @return set of all available service provider instances for the contract.
      */
     public static <T> Set<T> getCustomProviders(final ServiceLocator locator, final Class<T> contract) {
-        final Collection<ServiceHandle<T>> hk2Providers = getServiceHandles(locator, contract, new CustomAnnotationImpl());
+        final Collection<ServiceHandle<T>> hk2Providers = getServiceHandles(locator, contract, Custom.INSTANCE);
         return getClasses(hk2Providers);
     }
 
@@ -225,7 +225,7 @@ public final class Providers {
      * @return iterable of all available ranked service providers for the contract. Return value is never null.
      */
     public static <T> Iterable<RankedProvider<T>> getAllRankedProviders(final ServiceLocator locator, final Class<T> contract) {
-        final List<ServiceHandle<T>> providers = getServiceHandles(locator, contract, new CustomAnnotationImpl());
+        final List<ServiceHandle<T>> providers = getServiceHandles(locator, contract, Custom.INSTANCE);
         providers.addAll(getServiceHandles(locator, contract));
 
         final LinkedHashMap<ActiveDescriptor<T>, RankedProvider<T>> providerMap =
@@ -330,7 +330,7 @@ public final class Providers {
      * @return set of all available service provider instances for the contract
      */
     public static <T> Collection<ServiceHandle<T>> getAllServiceHandles(final ServiceLocator locator, final Class<T> contract) {
-        final List<ServiceHandle<T>> providers = getServiceHandles(locator, contract, new CustomAnnotationImpl());
+        final List<ServiceHandle<T>> providers = getServiceHandles(locator, contract, Custom.INSTANCE);
         providers.addAll(getServiceHandles(locator, contract));
 
         final LinkedHashMap<ActiveDescriptor, ServiceHandle<T>> providerMap =

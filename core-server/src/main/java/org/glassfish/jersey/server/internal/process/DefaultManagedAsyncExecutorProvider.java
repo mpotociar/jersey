@@ -40,57 +40,30 @@
 
 package org.glassfish.jersey.server.internal.process;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.inject.Inject;
-
-import org.glassfish.jersey.process.JerseyProcessingUncaughtExceptionHandler;
-import org.glassfish.jersey.process.internal.RequestExecutorFactory;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
-import org.glassfish.jersey.spi.RequestExecutorProvider;
-
-import org.glassfish.hk2.api.ServiceLocator;
-
-import jersey.repackaged.com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.glassfish.jersey.spi.ThreadPoolExecutorProvider;
 
 /**
- * {@link org.glassfish.jersey.process.internal.RequestExecutorFactory Executors factory}
- * used on the server side for managed asynchronous request invocations.
+ * Default {@link org.glassfish.jersey.spi.ExecutorServiceProvider} used on the server side for managed asynchronous
+ * request processing.
  *
- * @author Miroslav Fuksa
  * @author Marek Potociar (marek.potociar at oracle.com)
  */
-class ServerManagedAsyncExecutorFactory extends RequestExecutorFactory implements ContainerLifecycleListener {
+// TODO move to runtime exec. binder?
+@ManagedAsyncExecutor
+class DefaultManagedAsyncExecutorProvider extends ThreadPoolExecutorProvider implements ContainerLifecycleListener {
+
+    private static final Logger LOGGER = Logger.getLogger(DefaultManagedAsyncExecutorProvider.class.getName());
 
     /**
-     * Creates a new instance.
-     *
-     * @param locator HK2 service locator.
+     * Create new instance for the default managed async executor provider.
      */
-    @Inject
-    public ServerManagedAsyncExecutorFactory(ServiceLocator locator) {
-        super(locator);
-    }
-
-    @Override
-    protected RequestExecutorProvider getDefaultProvider(Object... initArgs) {
-        return new RequestExecutorProvider() {
-
-            @Override
-            public ExecutorService getRequestingExecutor() {
-                return Executors.newCachedThreadPool(new ThreadFactoryBuilder()
-                        .setNameFormat("jersey-server-managed-async-executor-%d")
-                        .setUncaughtExceptionHandler(new JerseyProcessingUncaughtExceptionHandler())
-                        .build());
-            }
-
-            @Override
-            public void releaseRequestingExecutor(ExecutorService executor) {
-                executor.shutdownNow();
-            }
-        };
+    public DefaultManagedAsyncExecutorProvider() {
+        super("jersey-server-managed-async-executor");
     }
 
     @Override
@@ -105,6 +78,10 @@ class ServerManagedAsyncExecutorFactory extends RequestExecutorFactory implement
 
     @Override
     public void onShutdown(Container container) {
-        close();
+        try {
+            close();
+        } catch (Exception e) {
+            LOGGER.log(Level.FINE, "Error closing the managed asynchronous request executor provider.", e);
+        }
     }
 }

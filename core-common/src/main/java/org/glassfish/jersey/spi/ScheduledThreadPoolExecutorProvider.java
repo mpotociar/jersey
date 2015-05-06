@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,43 +39,45 @@
  */
 package org.glassfish.jersey.spi;
 
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * An extension contract for providing pluggable thread factory providers that produce thread
- * factories used by Jersey runtime whenever a new thread factory is needed to create Jersey
- * runtime threads.
+ * Default implementation of the Jersey {@link org.glassfish.jersey.spi.ScheduledExecutorServiceProvider
+ * scheduled executor service provider SPI}.
  * <p>
- * This mechanism allows Jersey to run in environments that have specific thread management and
- * provisioning requirements, such as application servers etc. Dedicated Jersey extension modules
- * or applications running in such environment may provide a custom implementation of the
- * {@code RuntimeThreadProvider} interface to customize the Jersey runtime thread management
- * & provisioning strategy to comply with the threading requirements, models and policies
- * specific to each particular environment.
- * </p>
- * <p>
- * Note that only a single thread factory provider can be registered in each application.
+ * This provider creates and provisions a {@link java.util.concurrent.ScheduledThreadPoolExecutor} instance
+ * using the customizable {@link #getCorePoolSize() core threads}, {@link #getBackingThreadFactory() backing thread factory}
+ * and {@link #getRejectedExecutionHandler() rejected task handler} values. Subclasses may override the respective methods
+ * to customize the parameters of the provisioned scheduler.
  * </p>
  *
  * @author Marek Potociar (marek.potociar at oracle.com)
+ * @since 2.18
  */
-@Contract
-public interface RuntimeThreadProvider {
-    /**
-     * Get a {@code ThreadFactory} that will be used to create threads scoped to the current request.
-     * <p>
-     * The method is not used by Jersey runtime at the moment but may be required in the future.
-     * </p>
-     *
-     * @return a thread factory to be used to create current request scoped threads.
-     */
-    public ThreadFactory getRequestThreadFactory();
+public class ScheduledThreadPoolExecutorProvider extends AbstractThreadPoolProvider<ScheduledThreadPoolExecutor>
+        implements ScheduledExecutorServiceProvider {
 
     /**
-     * Get a {@code ThreadFactory} that will create threads that will be used for running background
-     * tasks, independently of current request scope.
+     * Create a new instance of the scheduled thread pool executor provider.
      *
-     * @return a thread factory to be used to create background runtime task threads.
+     * @param name provider name. The name will be used to name the threads created & used by the
+     *             provisioned scheduled thread pool executor.
      */
-    public ThreadFactory getBackgroundThreadFactory();
+    public ScheduledThreadPoolExecutorProvider(final String name) {
+        super(name);
+    }
+
+    @Override
+    public ScheduledExecutorService getExecutorService() {
+        return super.getExecutor();
+    }
+
+    @Override
+    protected ScheduledThreadPoolExecutor createExecutor(
+            final int corePoolSize, final ThreadFactory threadFactory, final RejectedExecutionHandler handler) {
+        return new ScheduledThreadPoolExecutor(corePoolSize, threadFactory, handler);
+    }
 }
